@@ -16,7 +16,7 @@ class FileView(APIView):
         if request.method == 'POST' and request.FILES['myfile']:
             myfile = request.FILES['myfile']
             fs = FileSystemStorage()
-            filename = fs.save(myfile.name, myfile)
+            filename = fs.save("files/" + myfile.name, myfile)
             uploaded_file_url = fs.url(filename)
             return render(request, 'mainpage/index.html', {
                 'uploaded_file_url': uploaded_file_url
