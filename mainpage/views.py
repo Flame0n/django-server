@@ -27,24 +27,31 @@ class FileView(APIView):
             myfile = request.FILES['myfile']
             fs = FileSystemStorage()
 
+            import socket
+            print(socket.gethostbyname(socket.getfqdn()))
+
             # Сheck the existence of the same file and delete it
+            print("files/" + myfile.name)
             if (fs.exists("files/" + myfile.name) == True):
                 fs.delete("files/" + myfile.name)
 
+            if (fs.exists("files/" + myfile.name.split('.', 1)[0] + "_0001.png") == True):
+                fs.delete("files/" + myfile.name.split('.', 1)[0] + "_0001.png")
+
             filename = fs.save("files/" + myfile.name, myfile)
             uploaded_file_url = fs.url(filename)
-            
+
             # Activate the trigger
             trigger(uploaded_file_url)
 
             rendered_file_url = "files/" + \
                 myfile.name.split('.', 1)[0] + "_0001.png"
 
-            while (fs.exists("files/" + rendered_file_url)):
+            while (fs.exists(rendered_file_url) == False):
                 time.sleep(1)
 
             return render(request, 'mainpage/index.html', {
-                'uploaded_file_url': rendered_file_url
+                'rendered_file_url': rendered_file_url
             })
         return render(request, 'mainpage/index.html')
 
@@ -52,7 +59,7 @@ class FileView(APIView):
 def trigger(url):
     NAME_OF_JOB = "get_data"
     TOKEN_NAME = "render"
-    PARAMETERS = {'URL_FILE': SERVER_URL + url}
+    PARAMETERS = {'URL_FILE': SERVER_URL + url, }
     jenkins_obj = JenkinsTrigger()
     return asyncio.run(jenkins_obj.build_job(NAME_OF_JOB, PARAMETERS, TOKEN_NAME))
 
@@ -63,11 +70,6 @@ def ret(request):
     if request.method == 'POST' and request.FILES['upload_file']:
         myfile = request.FILES['upload_file']
         fs = FileSystemStorage()
-
-        # Сheck the existence of the same file and delete it
-        if (fs.exists("files/" + myfile.name) == True):
-                fs.delete("files/" + myfile.name)
-
         fs.save("files/" + myfile.name, myfile)
         return Response("Success")
     return Response("Error")
