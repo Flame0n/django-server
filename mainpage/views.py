@@ -13,8 +13,8 @@ import time
 from . jenkinsTrigger import JenkinsTrigger
 
 import asyncio
-SERVER_URL = "http://127.0.0.1:8000"
-#SERVER_URL = "http://3.137.149.140:8000"
+#SERVER_URL = "http://127.0.0.1:8000"
+SERVER_URL = "http://3.137.149.140:8000"
 
 
 class FileView(APIView):
